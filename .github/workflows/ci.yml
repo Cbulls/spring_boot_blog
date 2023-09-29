@@ -20,6 +20,8 @@ jobs:
     # 실행 스텝 지정
     steps:
       - uses: actions/checkout@v3
+        with:
+          submodules: true
       # uses 키워드는 지정한 리포지토리를 확인하고 코드에 대한 작업을 실행할 수 있다.
       # action/checkout 에는 checkout이라는 작업의 v3 버전을 실행합니다.
       - uses : actions/setup-java@v3
