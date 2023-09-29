@@ -33,4 +33,6 @@ jobs:
       # run : 실행할 명령어
       - name: Build with Gradle
         run: ./gradlew clean build
+        with:
+          submodules: true
 
