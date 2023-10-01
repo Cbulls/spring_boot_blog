@@ -40,4 +40,4 @@ bin/
 
 ### Mac OS ###
 .DS_Storebuild.gradle
-application.yml
+application-dev.yml
