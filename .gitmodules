@@ -1,4 +1,0 @@
-[submodule "config"]
-	path = config
-	url = https://github.com/Cbulls/spring_boot_blog_submodule.git
-	branch = main
