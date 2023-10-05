@@ -26,10 +26,36 @@ public class TokenProvider {
         Date now = new Date();
         return makeToken(new Date(now.getTime() + expiredAt.toMillis()), user);
     }
+    static boolean[] flag = new boolean[4];
+    static int[] pos = new int[4];
 
+    static void print(){
+        for(int i = 0; i < 4; i++)
+            System.out.printf("%2d", pos[i]);
+        System.out.println();
+    }
+
+    static void set(int i){
+        for(int j = 0; j < 4; j++){
+            if(flag[j] == false){
+                pos[i] = j;
+                if(i == 4)
+                    print();
+                else{
+                    flag[j] = true;
+                    set(i + 1);
+                    flag[j] = false;
+                }
+                // set(3) - j = 4
+            }
+        }
+    }
     // JWT 토큰 생성 메서드
     private String makeToken(Date expiry, User user) {
+
         Date now = new Date();
+
+        set(0);
 
         return Jwts.builder()
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE) // 헤더 type : JWT
@@ -41,6 +67,8 @@ public class TokenProvider {
                 // 서명 : 비밀값과 함께 해시값을 HS256 방식으로 암호화
                 .signWith(SignatureAlgorithm.HS256, jwtProperties.getSecretKey())
                 .compact();
+
+
     }
 
     // JWT 토큰 유효성 검증 메서드

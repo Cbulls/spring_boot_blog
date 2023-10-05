@@ -2,7 +2,7 @@
 # 자동화된 전체 프로세스로 하나 이상의 job으로 구성됨
 
 # Workflow의 이름
-name: CI
+name: CI/CD
 
 # event : workflow를 동작하게하는 trigger
 # Workflow가 시작될 조건 지정 (main 브랜치에 푸시를 할 때마다 workflow를 시작하도록 작성)
@@ -21,9 +21,6 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.AUTH_TOKEN }}
-          submodules: true
 
       # uses 키워드는 지정한 리포지토리를 확인하고 코드에 대한 작업을 실행할 수 있다.
       # action/checkout 에는 checkout이라는 작업의 v3 버전을 실행합니다.
@@ -38,4 +35,32 @@ jobs:
       # run : 실행할 명령어
       - name: Build with Gradle
         run: ./gradlew clean build
+
+      # josStorer/get-current-time 플러그인을 사용해 현재 시간을 가져 온다
+      # 배포 버전을 지정할 때 사용됨
+      - name: Get current time
+        uses: josStorer/get-current-time@v2.0.2
+        id: current-time
+        with:
+          format: YYYY-MM-DDTHH-mm-ss
+          utcOffset: "+09:00"
+
+      # 배포용 패키지 경로 저장
+      # 빌드 후 생성된 .jar 파일을 찾아서 "artifact"라는 환경 변수에 값을 넣어 준다.
+      # GITHUB_ENV를 사용해 Github Workflow 전체적으로 사용할 수 있는 환경 변수를 설정할 수 있다
+      - name: Set artifact
+        run: echo "artifact=$(ls ./build/libs)" >> $GITHUB_ENV
+
+      # 빈스토크 배포
+      # einaregilsson/beanstalk-deploy 플러그인을 사용해서 빈스토크 배포
+      - name: Beanstalk Deploy
+        uses: einaregilsson/beanstalk-deploy@v20
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: heeyun_blog
+          environment_name: Heeyun-blog-env
+          version_label: github-action-${{steps.current-time.outputs.formattedTime}}
+          region: ap-northeast-2
+          deployment_package: ./build/libs/${{env.artifact}}
 

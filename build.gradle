@@ -37,6 +37,12 @@ test {
     useJUnitPlatform()
 }
 
+// jar 파일은 plain archive라고 하며 애플리케이션 실행에 필요한 의존성을 포함하지 않고 소스 코드의 클래스 파일과 리소스 파일만 포함한다.
+// 따라서 플레인 아카이브만으로는 서비스를 실행할 수 없기에 빌드 시에 일반 jar 파일만 생성하도록 Gradle 변경함
+jar {
+    enabled = false
+}
+
 tasks.register('copyGitSubmodule', Copy) {
     from './config'
     include '*.yml'
